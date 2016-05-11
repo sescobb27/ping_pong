@@ -1,0 +1,19 @@
+{application, pong,
+ [{description, "An OTP application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { pong_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {start_phases , [
+    {create_kafka_client, []}
+  ]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.

@@ -1,0 +1,20 @@
+{application, ping_pong,
+ [{description, "An OTP application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { ping_pong_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    cowboy,
+    ping,
+    pong
+   ]},
+  {included_applications, [ping, pong]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
