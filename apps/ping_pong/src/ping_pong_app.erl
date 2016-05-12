@@ -15,8 +15,8 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-    application:start(ping),
-    application:start(pong),
+    application:ensure_all_started(ping),
+    application:ensure_all_started(pong),
     ping_pong_sup:start_link().
 
 %%--------------------------------------------------------------------
