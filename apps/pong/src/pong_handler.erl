@@ -4,4 +4,4 @@
 init() ->
   PongChannel = bunny_client:init(<<"pong">>),
   PingChannel = bunny_client:init(<<"ping">>),
-  {ok, _Pid} = consumer:consume_with_reply(PingChannel, PongChannel, <<"ping">>).
+  consumer:consume_with_reply(PingChannel, PongChannel, <<"ping">>).

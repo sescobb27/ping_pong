@@ -5,9 +5,11 @@
 -include_lib("amqp_client/include/amqp_client.hrl").
 
 consume_with_reply(PingChannel, PongChannel, Queue) ->
-  Pid = spawn(?MODULE, loop, [PingChannel, PongChannel, Queue]),
-  bunny_client:subscribe(PingChannel, Queue, Pid),
-  {ok, Pid}.
+  lists:map(fun(_) ->
+    Pid = spawn(?MODULE, loop, [PingChannel, PongChannel, Queue]),
+    bunny_client:subscribe(PingChannel, Queue, Pid),
+    Pid
+  end, lists:seq(0, 100)).
 
 loop(PingChannel, PongChannel, Queue) ->
   bunny_client:consume_msg(PingChannel, Queue),
