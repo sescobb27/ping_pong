@@ -5,12 +5,14 @@
   {mod, { pong_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    cowboy,
+    amqp_client,
+    mnesia,
+    uuid,
+    jsone
    ]},
   {env,[]},
-  {start_phases , [
-    {create_kafka_client, []}
-  ]},
   {modules, []},
 
   {maintainers, []},

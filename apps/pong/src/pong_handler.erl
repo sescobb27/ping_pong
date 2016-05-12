@@ -1,12 +1,7 @@
 -module (pong_handler).
--export ([init/3, terminate/3, handle/2]).
+-export ([init/0]).
 
-init(_Type, Req, []) ->
-  {shutdown, Req, no_state}.
-
-handle(Req, Opts) ->
-  kafka_client:produce(pong_client, <<"pong">>, <<"PONG_MESSAGE">>),
-  {ok, Req, Opts}.
-
-terminate(_Reason, _Req, _State) ->
-  ok.
+init() ->
+  PongChannel = bunny_client:init(<<"pong">>),
+  PingChannel = bunny_client:init(<<"ping">>),
+  {ok, _Pid} = consumer:consume_with_reply(PingChannel, PongChannel, <<"ping">>).
