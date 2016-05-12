@@ -8,11 +8,14 @@
 -behaviour(application).
 
 %% Application callbacks
--export([start/2, stop/1]).
+-export([start/2, start/0, stop/1]).
 
 %%====================================================================
 %% API
 %%====================================================================
+-spec start() -> {ok, [atom()]} | {error, term()}.
+start() ->
+  {ok, _} = application:ensure_all_started(ping).
 
 start(_StartType, _StartArgs) ->
     Dispatch = cowboy_router:compile([
@@ -20,8 +23,8 @@ start(_StartType, _StartArgs) ->
         {"/ping", ping_handler, []}
       ]}
     ]),
-    {ok, _} = cowboy:start_http(ec_api, 100,
-      [{port, 3000}],
+    {ok, _} = cowboy:start_http(ping, 100,
+      [{port, 4000}],
       [{env, [{dispatch, Dispatch}]}]
     ),
     ping_sup:start_link().
