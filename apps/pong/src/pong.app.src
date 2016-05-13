@@ -10,7 +10,8 @@
     amqp_client,
     mnesia,
     uuid,
-    jsone
+    jsone,
+    poolboy
    ]},
   {env,[]},
   {modules, []},

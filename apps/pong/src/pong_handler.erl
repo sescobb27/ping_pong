@@ -2,6 +2,6 @@
 -export ([init/0]).
 
 init() ->
-  PongChannel = bunny_client:init(<<"pong">>),
-  PingChannel = bunny_client:init(<<"ping">>),
-  consumer:consume_with_reply(PingChannel, PongChannel, <<"ping">>).
+  Worker = poolboy:checkout(bunny_pool, true, infinity),
+  Connection = gen_server:call(Worker, get_connection),
+  consumer:consume_with_reply(Connection, <<"ping">>).

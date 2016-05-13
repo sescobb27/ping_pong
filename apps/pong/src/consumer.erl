@@ -1,20 +1,19 @@
 -module (consumer).
 
--export ([consume_with_reply/3, loop/3]).
+-export ([consume_with_reply/2, loop/2]).
 
--include_lib("amqp_client/include/amqp_client.hrl").
-
-consume_with_reply(PingChannel, PongChannel, Queue) ->
+consume_with_reply(Connection, Queue) ->
   lists:map(fun(_) ->
-    Pid = spawn(?MODULE, loop, [PingChannel, PongChannel, Queue]),
-    bunny_client:subscribe(PingChannel, Queue, Pid),
+    Channel = bunny_client:open_channel(Connection),
+    Pid = spawn(?MODULE, loop, [Channel, Queue]),
+    bunny_client:subscribe(Channel, Queue, Pid),
     Pid
-  end, lists:seq(0, 100)).
+  end, lists:seq(0, 5)).
 
-loop(PingChannel, PongChannel, Queue) ->
-  bunny_client:consume_msg(PingChannel, Queue),
+loop(Channel, Queue) ->
+  bunny_client:consume_msg(Channel, Queue),
   timer:sleep(2000),
   db:increment(),
   io:format("[producing] PONG_MESSAGE to pong queue~n"),
-  bunny_client:produce(PongChannel, <<"pong">>, <<"PONG_MESSAGE">>),
-  loop(PingChannel, PongChannel, Queue).
+  bunny_client:produce(Channel, <<"pong">>, <<"PONG_MESSAGE">>),
+  loop(Channel, Queue).

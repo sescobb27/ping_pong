@@ -27,6 +27,7 @@ start(_StartType, _StartArgs) ->
     [{port, 4001}],
     [{env, [{dispatch, Dispatch}]}]
   ),
+  bunny_client:init(),
   pong_handler:init(),
   db:init(),
   pong_sup:start_link().
