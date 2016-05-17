@@ -24,7 +24,7 @@ start_link() ->
 init([]) ->
   Children = poolboy:child_spec(bunny_pool, [
       {name, {local, bunny_pool}},
-      {size, 10},
+      {size, 70},
       {max_overflow, 20},
       {worker_module, bunny_worker}
     ], []),

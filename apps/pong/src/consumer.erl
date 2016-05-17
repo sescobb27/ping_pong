@@ -8,7 +8,7 @@ consume_with_reply(Connection, Queue) ->
     Pid = spawn(?MODULE, loop, [Channel, Queue]),
     bunny_client:subscribe(Channel, Queue, Pid),
     Pid
-  end, lists:seq(0, 5)).
+  end, lists:seq(0, 255)).
 
 loop(Channel, Queue) ->
   bunny_client:consume_msg(Channel, Queue),
