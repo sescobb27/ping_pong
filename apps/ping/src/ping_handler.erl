@@ -5,9 +5,9 @@ init(_Type, Req, []) ->
   {ok, Req, []}.
 
 handle(Req, State) ->
-  poolboy:transaction(bunny_pool, fun (Worker) ->
+  poolboy:transaction(bunny_ping_pool, fun (Worker) ->
     io:format("[producing] PING_MESSAGE to ping queue~n"),
-    Connection = gen_server:call(Worker, get_connection),
+    Connection = bunny_worker:get_connection(Worker),
     Channel = bunny_client:open_channel(Connection),
     bunny_client:produce(Channel, <<"ping">>, <<"PING_MESSAGE">>),
     bunny_client:subscribe(Channel, <<"pong">>, self()),

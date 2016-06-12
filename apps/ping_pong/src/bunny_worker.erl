@@ -5,7 +5,7 @@
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 
--export([start_link/1]).
+-export([start_link/1, get_connection/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
          code_change/3]).
 
@@ -13,6 +13,9 @@
 
 start_link(Args) ->
     gen_server:start_link(?MODULE, Args, []).
+
+get_connection(Worker) ->
+    gen_server:call(Worker, get_connection).
 
 init(_Args) ->
     process_flag(trap_exit, true),

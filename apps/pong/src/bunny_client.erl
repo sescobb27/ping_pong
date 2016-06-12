@@ -1,16 +1,22 @@
 -module (bunny_client).
--export ([init/0, produce/3, subscribe/3, open_channel/1, close_channel/1, consume_msg/2]).
+-export ([
+  init/0,
+  produce/3,
+  subscribe/3,
+  open_channel/1,
+  close_channel/1,
+  consume_msg/2]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 
 -spec init() -> pid().
 init() ->
-  Worker = poolboy:checkout(bunny_pool, false),
-  RabbitConnection1 = gen_server:call(Worker, get_connection),
+  Worker = poolboy:checkout(bunny_ping_pool, false),
+  RabbitConnection1 = bunny_worker:get_connection(Worker),
   Channel= open_channel(RabbitConnection1),
   ok = create_queues([<<"ping">>, <<"pong">>], Channel),
   bunny_client:close_channel(Channel),
-  poolboy:checkin(bunny_pool, Worker).
+  poolboy:checkin(bunny_ping_pool, Worker).
 
 open_channel(Connection) ->
   {ok, Channel} = amqp_connection:open_channel(Connection),
