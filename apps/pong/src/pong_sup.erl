@@ -30,7 +30,7 @@ start_link() ->
 init([]) ->
     PongChildren = #{
       id => pong_subscriber,
-      start => {pong_subscriber_sup, start_link, [5]},
+      start => {pong_subscriber_sup, start_link, [255]},
       restart => transient,
       type => worker
     },
