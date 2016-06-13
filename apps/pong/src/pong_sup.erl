@@ -28,7 +28,13 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+    PongChildren = #{
+      id => pong_subscriber,
+      start => {pong_subscriber_sup, start_link, [5]},
+      restart => transient,
+      type => worker
+    },
+    {ok, { {one_for_one, 10, 60}, [PongChildren]} }.
 
 %%====================================================================
 %% Internal functions

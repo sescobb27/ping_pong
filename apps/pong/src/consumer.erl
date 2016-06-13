@@ -1,17 +1,12 @@
 -module (consumer).
 
--export ([consume_with_reply/2, loop/2, create_consumers/3]).
+-export ([consume_with_reply/2, loop/2]).
 
 consume_with_reply(Connection, Queue) ->
   Channel = bunny_client:open_channel(Connection),
   Pid = spawn_link(?MODULE, loop, [Channel, Queue]),
   bunny_client:subscribe(Channel, Queue, Pid),
-  Pid.
-
-create_consumers(N, Connection, Queue) ->
-  lists:map(fun(_) ->
-    consume_with_reply(Connection, Queue)
-  end, lists:seq(0, N)).
+  {ok, Pid}.
 
 loop(Channel, Queue) ->
   bunny_client:consume_msg(Channel, Queue),
