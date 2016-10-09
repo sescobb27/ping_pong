@@ -2,10 +2,12 @@
 -export ([
   init/0,
   produce/3,
+  subscribe/2,
   subscribe/3,
   open_channel/1,
   close_channel/1,
-  consume_msg/2]).
+  consume_msg/2,
+  consume_msg/3]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 
@@ -41,12 +43,41 @@ subscribe(Channel, Queue, Consumer) ->
   Sub = #'basic.consume'{queue = Queue},
   #'basic.consume_ok'{} = amqp_channel:subscribe(Channel, Sub, Consumer).
 
+subscribe(Channel, Queue) ->
+  Sub = #'basic.consume'{queue = Queue},
+  #'basic.consume_ok'{} = amqp_channel:call(Channel, Sub).
+
 close_channel(Channel) ->
   amqp_channel:close(Channel).
 
 consume_msg(Channel, Queue) ->
   receive
-      {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Body}} ->
+    #'basic.consume_ok'{} ->
+      consume_msg(Channel, Queue);
+    #'basic.cancel_ok'{} ->
+      ok;
+    {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Body}} ->
+      amqp_channel:cast(Channel, #'basic.ack'{delivery_tag = Tag}),
+      io:format("[consuming] ~p from ~p queue~n", [Body, Queue]),
+      Body
+  end.
+
+consume_msg(Channel, Queue, Key) ->
+  receive
+    #'basic.consume_ok'{} ->
+      consume_msg(Channel, Queue, Key);
+    #'basic.cancel_ok'{} ->
+      ok;
+    {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Body}} ->
+      Msg = binary_to_term(Body),
+      KeyFromMsg = maps:get(key, Msg),
+      case KeyFromMsg of
+        Key ->
           amqp_channel:cast(Channel, #'basic.ack'{delivery_tag = Tag}),
-          io:format("[consuming] ~p from ~p queue~n", [Body, Queue])
+          io:format("[consuming] ~p from ~p queue~n", [Body, Queue]),
+          Body;
+        _ ->
+          amqp_channel:cast(Channel, #'basic.nack'{delivery_tag = Tag}),
+          consume_msg(Channel, Queue, Key)
+      end
   end.

@@ -25,13 +25,13 @@ init([]) ->
   Children1 = poolboy:child_spec(bunny_ping_pool, [
       {name, {local, bunny_ping_pool}},
       {size, 50},
-      {max_overflow, 20},
+      {max_overflow, 10},
       {worker_module, bunny_worker}
     ], []),
   Children2 = poolboy:child_spec(bunny_pong_pool, [
     {name, {local, bunny_pong_pool}},
-    {size, 50},
-    {max_overflow, 20},
+    {size, 10},
+    {max_overflow, 0},
     {worker_module, bunny_worker}
   ], []),
   {ok, { {one_for_one, 10, 10}, [Children1, Children2]} }.

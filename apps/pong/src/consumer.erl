@@ -9,8 +9,15 @@ consume_with_reply(Connection, Queue) ->
   {ok, Pid}.
 
 loop(Channel, Queue) ->
-  bunny_client:consume_msg(Channel, Queue),
+  BinaryMsg = bunny_client:consume_msg(Channel, Queue),
+  Msg = binary_to_term(BinaryMsg),
+  Key = maps:get(key, Msg),
+  PongMsg = #{
+    key => Key,
+    msg => <<"PONG_MESSAGE">>
+  },
   db:increment(),
   io:format("[producing] PONG_MESSAGE to pong queue~n"),
-  bunny_client:produce(Channel, <<"pong">>, <<"PONG_MESSAGE">>),
+  BinaryPongMsg = term_to_binary(PongMsg),
+  bunny_client:produce(Channel, <<"pong">>, BinaryPongMsg),
   loop(Channel, Queue).
