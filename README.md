@@ -10,6 +10,6 @@ Build
 
 WORKLOAD
 ```bash
-go get github.com/rakyll/boom
-boom -cpus=8 -n=10000 -c=100 http://localhost:4001/ping
+go get github.com/rakyll/hey
+hey -cpus=8 -n=10000 -c=100 http://localhost:4000/ping
 ```
